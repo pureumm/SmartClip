@@ -1,17 +1,18 @@
-# SmartClip — Real-Time Windows Clipboard Automation & Text Normalization
+# SmartClip — Windows Clipboard Location Action Assistant
 
-A lightweight, zero-dependency Windows background utility built in Python that monitors system clipboard events in real time, automatically sanitizes and normalizes copied text, and dispatches non-intrusive system notifications.
+A lightweight Windows desktop utility built in Python that monitors OS clipboard events in real time, detects copied addresses or landmarks, and launches an instant floating Tkinter action assistant for Google Maps navigation, nearby parking, restaurants, and local weather.
 
 ## Key Engineering Features
-- **Low-Overhead Win32 API Polling (`ctypes`):** Interfaces directly with native Windows user32/kernel32 APIs (`OpenClipboard`, `GetClipboardData`, `GlobalLock`) without heavy third-party GUI frameworks.
-- **Self-Trigger Debounce Control (`3.0s`):** Implements a deterministic cooldown state machine to prevent infinite polling loops when programmatic clipboard re-writes occur.
-- **Encoding-Safe Text Normalization:** Automatically trims trailing whitespace, collapses redundant line breaks, and strips formatting artifacts with strict `UTF-16LE` / `UTF-8` memory buffer handling to eliminate `UnicodeDecodeError` crashes.
+- **OS-Level Event Detection (`GetClipboardSequenceNumber`):** Polls the native Windows `user32` clipboard sequence counter via `ctypes` rather than blindly reading text, minimizing CPU overhead and preventing redundant UI triggers.
+- **Bilingual Location Heuristic Engine (`is_location_text`):** Automatically identifies Korean and English addresses/landmarks (e.g., `-로`, `-길`, `-동`, `Street`, `Avenue`, `Station`, `Tower`) while filtering out source code snippets (`import`, `def`, `tk.Tk`).
+- **Debounce & State Management (`3.0s` Cooldown):** Implements duplicate-copy cooldown protection, modal lock (`is_popup_open`), and a 15-second inactivity auto-close timer (`AutoCloseTimer`) that resets dynamically on mouse or keyboard interaction.
+- **One-Click Location Workflows & History:** Provides instant URL-encoded deep links to Google Maps, Directions, Nearby Parking, Restaurants, and Weather, alongside an interactive 3-item recent location switcher.
 
 ## Tech Stack
 - **Language:** Python 3.x
-- **System Interface:** Windows Win32 API (`ctypes`), `win10toast` / native notification dispatch
-- **Architecture:** Event-driven background daemon with minimal CPU/RAM footprint
+- **GUI & OS Integration:** `tkinter`, Windows Win32 API (`ctypes.windll.user32`), `pyperclip`, `webbrowser`, `urllib.parse`
 
 ## Usage
 ```bash
+pip install pyperclip
 python smartclip.py
